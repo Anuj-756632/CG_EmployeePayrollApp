@@ -1,57 +1,57 @@
 package com.employeepayrollapp;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.employeepayrollapp.Employee;
+import com.employeepayrollapp.EmployeeRepository;
+import com.employeepayrollapp.UserDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class EmployeeService {
 
-    private final List<UserDTO> employees = new ArrayList<>();
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
-    public List<UserDTO> getEmployees() {
-        // Return the list of employees
-        return employees;
+    // Get all employees
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 
-    public UserDTO getEmployeeById(Long id) {
-        // Find the employee by ID or throw an exception if not found
-        return employees.stream()
-                .filter(employee -> employee.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Employee not found!"));
+    // Get employee by ID
+    public Employee getEmployeeById(Long id) {
+        return employeeRepository.findById(id).orElse(null); // Returns null if not found
     }
 
-    public UserDTO createEmployee(UserDTO employee) {
-        // Add the new employee to the list
-        employees.add(employee);
-        return employee;
+    // Create employee
+    public Employee createEmployee(UserDTO employeeDTO) {
+        Employee employee = new Employee();
+        employee.setName(employeeDTO.getName());
+        employee.setSalary(employeeDTO.getSalary());
+        return employeeRepository.save(employee);
     }
 
-    public UserDTO updateEmployee(Long id, UserDTO updatedEmployee) {
-        // Update the employee details
-        Optional<UserDTO> existingEmployee = employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst();
-
-        if (!existingEmployee.isPresent()) {
-            throw new RuntimeException("Employee not found!");
+    // Update employee by ID
+    public Employee updateEmployee(Long id, UserDTO employeeDTO) {
+        Optional<Employee> existingEmployee = employeeRepository.findById(id);
+        if (existingEmployee.isPresent()) {
+            Employee employee = existingEmployee.get();
+            employee.setName(employeeDTO.getName());
+            employee.setSalary(employeeDTO.getSalary());
+            return employeeRepository.save(employee);
         }
-
-        UserDTO employee = existingEmployee.get();
-        employee.setName(updatedEmployee.getName());
-        employee.setSalary(updatedEmployee.getSalary());
-        return employee;
+        return null; // Employee not found
     }
 
-    public void deleteEmployee(Long id) {
-        // Remove the employee from the list
-        boolean removed = employees.removeIf(employee -> employee.getId().equals(id));
-
-        if (!removed) {
-            throw new RuntimeException("Employee not found!");
+    // Delete employee by ID
+    public boolean deleteEmployee(Long id) {
+        if (employeeRepository.existsById(id)) {
+            employeeRepository.deleteById(id);
+            return true;
         }
+        return false; // Employee not found
     }
 }

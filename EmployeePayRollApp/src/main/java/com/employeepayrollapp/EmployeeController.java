@@ -1,53 +1,41 @@
 package com.employeepayrollapp;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.employeepayrollapp.Employee;
+import com.employeepayrollapp.EmployeeService;
+import com.employeepayrollapp.UserDTO;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
-
-    private final List<UserDTO> employees = new ArrayList<>();
+    @Autowired
+    private EmployeeService employeeService;
 
     @GetMapping
-    public List<UserDTO> getEmployees() {
-        // Return the list of employees
-        return employees;
+    public List<Employee> getEmployees() {
+        return employeeService.getAllEmployees();
     }
 
     @GetMapping("/{id}")
-    public UserDTO getEmployeeById(@PathVariable Long id) {
-        // Find the employee by ID
-        return employees.stream()
-                .filter(employee -> employee.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Employee not found!"));
+    public Employee getEmployeeById(@PathVariable Long id) {
+        return employeeService.getEmployeeById(id);
     }
 
     @PostMapping
-    public UserDTO createEmployee(@RequestBody UserDTO employee) {
-        // Add the new employee to the list
-        employees.add(employee);
-        return employee;
+    public Employee createEmployee(@RequestBody UserDTO employee) {
+        return employeeService.createEmployee(employee);
     }
 
     @PutMapping("/{id}")
-    public UserDTO updateEmployee(@PathVariable Long id, @RequestBody UserDTO updatedEmployee) {
-        // Update the employee details
-        UserDTO employee = employees.stream()
-                .filter(e -> e.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Employee not found!"));
-        employee.setName(updatedEmployee.getName());
-        employee.setSalary(updatedEmployee.getSalary());
-        return employee;
+    public Employee updateEmployee(@PathVariable Long id, @RequestBody UserDTO employee) {
+        return employeeService.updateEmployee(id, employee);
     }
 
     @DeleteMapping("/{id}")
     public void deleteEmployee(@PathVariable Long id) {
-        // Remove the employee from the list
-        employees.removeIf(employee -> employee.getId().equals(id));
+        employeeService.deleteEmployee(id);
     }
 }
