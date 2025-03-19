@@ -1,8 +1,5 @@
 package com.employeepayrollapp;
 
-import com.employeepayrollapp.Employee;
-import com.employeepayrollapp.EmployeeService;
-import com.employeepayrollapp.UserDTO;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
